@@ -98,7 +98,7 @@ function Loop:_collectSystemsUnderPhaseRecursive(systems, phase)
 		table.insert(systems, system)
 	end
 	for after in self._world:query(self._components.Phase):with(pair(self._components.DependsOn, phase)) do
-		self:collectSystemsUnderPhaseRecursive(systems, after)
+		self:_collectSystemsUnderPhaseRecursive(systems, after)
 	end
 end
 
@@ -118,7 +118,7 @@ function Loop:_collect()
 end
 
 function Loop:phase(after)
-	local phase = self.world:entity()
+	local phase = self._world:entity()
 	self._world:add(phase, self._components.Phase)
 	self._world:add(phase, pair(self._components.DependsOn, after))
 	return phase
