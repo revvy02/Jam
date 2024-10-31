@@ -5,6 +5,7 @@ local IS_CLIENT = RunService:IsClient()
 
 local Jecs = require(script.Parent.Parent.Jecs)
 local Jabby = require(script.Parent.Parent.Jabby)
+local Types = require(script.Parent.Types)
 
 local pair = Jecs.pair
 local topoRuntime = require(script.Parent.topoRuntime)
@@ -24,18 +25,24 @@ local function systemFn(system)
 end
 
 local function systemName(system)
+	if typeof(system) == "table" then
+		return system.name
+	end
 	local fn = systemFn(system)
 	return debug.info(fn, "s") .. "->" .. debug.info(fn, "n")
 end
 
-function Loop.new(params: { name: string, debug: any, world: any }, ...)
+function Loop.new<T...>(
+	params: { name: string, debug: Types.Entity<string>, world: Types.World },
+	...: T...
+): Types.Loop<T...>
 	local self = setmetatable({}, Loop)
 
 	self._name = params.name
 	self._debug = params.debug or Jecs.Name
 	self._running = false
 
-	self._state = { ... }
+	self._state = table.pack(...)
 	self._stateLength = select("#", ...)
 
 	self._world = params.world
@@ -168,7 +175,7 @@ function Loop:begin()
 
 					local commitFailed = false
 					local thread = coroutine.create(function(...)
-						self._reporter:run(system.jabbyId, system.callback)
+						self._reporter:run(system.jabbyId, system.callback, ...)
 					end)
 
 					local success, errorValue = coroutine.resume(thread, unpack(self._state, 1, self._stateLength))

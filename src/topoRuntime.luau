@@ -119,7 +119,7 @@ end
 	@param discriminator? any -- A unique value to additionally key by
 	@param cleanupCallback (storage: {}) -> boolean? -- A function to run when the storage for this hook is cleaned up
 ]=]
-local function useHookState(discriminator, cleanupCallback): {}
+local function useHookState(discriminator: any, cleanupCallback: (storage: {}) -> ()): {}
 	local file, line = debug.info(3, "sl")
 	local fn = debug.info(2, "f")
 
